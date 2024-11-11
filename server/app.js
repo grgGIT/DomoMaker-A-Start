@@ -11,7 +11,7 @@ const router = require('./router.js');
 
 const port = process.env.PORT || process.env.PORT || 3000;
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1/Domomaker';
+const dbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/Domomaker';
 mongoose.connect(dbURI).catch((err) => {
   if (err) {
     console.log(err, ' - Could not connect to database');
