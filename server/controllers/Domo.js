@@ -68,10 +68,10 @@ const makeDomo = async (req, res) => {
     return res.status(500).json({ error: 'An error occurred making domo' });
   }
 };
+const DomoModel = mongoose.model('Domo', DomoSchema);
+
 module.exports = {
   makerPage,
   makeDomo,
+  DomoModel,
 };
-
-const DomoModel = mongoose.model('Domo', DomoSchema);
-module.exports = DomoModel;
