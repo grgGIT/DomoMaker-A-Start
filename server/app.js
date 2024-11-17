@@ -32,36 +32,38 @@ redisClient.connect().then(() => {
   const app = express();
 
   app.use(helmet());
-  app.use('/assets', express.static(path.resolve(`${__dirname}, '../hosted/`)));
+  app.use('/assets', express.static(path.resolve(__dirname, '../hosted/assets')));
+  app.use(favicon(path.join(__dirname, '../hosted/img/favicon.png')));
+  app.use(compression());
+  app.use(bodyParser.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+
+  app.use(session({
+    key: 'sessionid',
+    secret: 'Domo Arigato',
+    store: new RedisStore({ client: redisClient }),
+    resave: true,
+    saveUninitialized: true,
+  }));
+
+  app.engine('handlebars', expressHandlebars.engine({ defaultLayout: '' }));
+  app.set('view engine', 'handlebars');
+  app.set('views', path.join(__dirname, '../views'));
+  router(app);
+
+  app.listen(port, (err) => {
+    if (err) { throw err; }
+    console.log(`Server is running on port ${port}`);
+  });
+}).catch((err) => {
+  console.log('Redis Client Error', err);
 });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
-
-const app = express();
-app.use(helmet());
-app.use('/assets', express.static(path.resolve(`${__dirname}, '../hosted/`)));
-app.use(favicon(`${__dirname}/../hosted/img/favicon.png`));
-app.use(compression());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-app.use(session({
-  key: 'sessionid',
-  secret: 'Domo Arigato',
-  store: new RedisStore({ client: redisClient }),
-  resave: true,
-  saveUninitialized: true,
-  // cookie: {
-  //   httpOnly: true,
-  // },
-
-}));
-
-app.engine('handlebars', expressHandlebars.engine({ defaultLayout: '' }));
-app.set('view engine', 'handlebars');
-app.set('views', `${__dirname}, '/../views`);
-router(app);
-app.listen(port, (err) => {
-  if (err) { throw err; }
-  console.log(`Server is running on port ${port}`);
-});
+// app.engine('handlebars', expressHandlebars.engine({ defaultLayout: '' }));
+// app.set('view engine', 'handlebars');
+// app.set('views', `${__dirname}, '/../views`);
+// router(app);
+// app.listen(port, (err) => {
+//   if (err) { throw err; }
+//   console.log(`Server is running on port ${port}`);
+// });
